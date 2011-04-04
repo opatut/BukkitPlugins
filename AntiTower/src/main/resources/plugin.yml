@@ -1,0 +1,21 @@
+name: AntiTower
+main: me.opatut.bukkit.AntiTower.AntiTower
+version: 0.2.0
+website: opatutlol@aol.com
+author: opatut
+description: >
+    Remove pillars created by your players automatically. Minimum pillar height adjustable. Players can use /keeptower if they wish to keep their pillar. This can be disabled.
+commands:
+    keeptower:
+        description: Stop the plugin from deleting your tower.
+        usage: |
+            /<command> - Keep the tower you have built so far. 
+    deletetower:
+        description: Deletes the currently built tower.
+        usage: |
+            /<command> - Deletes the currently built tower.
+#  command:
+#    description: description
+#    usage: |
+#           /<command> <arg1> [arg2]
+#           Example: /<command> - description

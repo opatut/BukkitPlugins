@@ -1,0 +1,56 @@
+<project name="StopMobDrop" default="deploy" basedir=".">
+	<property name="pluginname" value="StopMobDrop"/>
+    <property name="plugins" location="/home/paul/minecraft/Servers/dev_cb/plugins/"/>
+    <property name="jars" location="/home/paul/minecraft/Jars/" />
+    
+    <property name="bukkitjar"
+        location="${jars}/bukkit/bukkit-RC.jar"/>
+    <!--<property name="permissionsjar" location="${jars}/externals/Permissions/Permissions-RC.jar" />-->
+
+    <property name="server" location="/srv/http/BukkitPlugins/" />
+	<property name="src" location="src"/>
+	<property name="bin" location="bin"/>
+	<property name="dist" location="dist"/>
+
+	<target name="init">
+		<mkdir dir="${bin}"/>
+	</target>
+
+    <target name="increment_version" depends="init">
+        <exec executable="sh" os="Linux">
+            <arg value="counter.sh" />
+            <arg value="build"/>
+        </exec>
+        <exec executable="sh" os="Linux">
+            <arg value="setbuild.sh" />
+        </exec>
+    </target>
+
+	<target name="compile" depends="increment_version">
+        <javac srcdir="${src}/main/java" destdir="${bin}" includeantruntime="false"
+            debug="true" debuglevel="lines,vars,source">
+			<classpath>
+                <!--<pathelement location="${permissionsjar}" />-->
+                <pathelement location="${bukkitjar}" />
+			</classpath>
+		</javac>
+    </target>
+
+	<target name="dist" depends="compile">
+		<mkdir dir="${dist}"/>
+		<jar jarfile="${dist}/${pluginname}.jar">
+			<fileset dir="${bin}"/>
+			<fileset file="${src}/main/resources/plugin.yml"/>
+		</jar>
+	</target>
+
+	<target name="deploy" depends="dist">
+		<copy file="${dist}/${pluginname}.jar" todir="${plugins}"/>
+		<copy file="${dist}/${pluginname}.jar" todir="${server}"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${bin}"/>
+		<delete dir="${dist}"/>
+	</target>
+</project>

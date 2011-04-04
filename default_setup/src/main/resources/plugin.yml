@@ -1,0 +1,13 @@
+name: NONAME
+main: me.opatut.bukkit.NONAME
+version: 0.0.0
+website: none
+author: opatut
+description: >
+    No description yet.
+commands:
+#  command:
+#    description: description
+#    usage: |
+#           /<command> <arg1> [arg2]
+#           Example: /<command> - description

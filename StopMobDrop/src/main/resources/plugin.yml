@@ -1,0 +1,13 @@
+name: StopMobDrop
+main: me.opatut.bukkit.StopMobDrop.StopMobDrop
+version: 1.1
+website: opatutlol@aol.com
+author: opatut
+description: >
+    Stop mobs from dropping items when killed by something else that a player's weapon. Mob traps will be obsolete.
+commands:
+#  command:
+#    description: description
+#    usage: |
+#           /<command> <arg1> [arg2]
+#           Example: /<command> - description
