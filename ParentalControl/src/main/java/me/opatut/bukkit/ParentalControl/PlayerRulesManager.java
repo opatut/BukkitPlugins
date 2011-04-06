@@ -4,7 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
+import org.bukkit.entity.Player;
 import org.bukkit.util.config.Configuration;
 
 public class PlayerRulesManager {
@@ -75,11 +77,71 @@ public class PlayerRulesManager {
 		return true;
 	}
 	
+	public int GetPlayerBudget(String player, String rule) {
+		if(mPlayerRuleBudget.containsKey(player + "." + rule)) 
+			return mPlayerRuleBudget.get(player + "." + rule);
+		else
+			return -1;
+	}
+	
+	public void NewDay() {
+		System.out.println("new day!");
+		for(String player: mPlayerRules.keySet()) {
+			for(String rulename: mPlayerRules.get(player)) {
+				Rule rule = mRules.get(rulename);
+				if(rule instanceof OnlineTimeRule) {
+					OnlineTimeRule r = (OnlineTimeRule)rule;
+					int new_budget = 0;
+					if(r.mKeepRemainder) {
+						new_budget = GetPlayerBudget(player, rulename);
+					}
+					new_budget += r.mMinutesPerDay;
+					mPlayerRuleBudget.put(player + "." + rulename, new_budget);
+					Player p = mPlugin.getServer().getPlayer(player);
+					if(p.isOnline()) {
+						p.sendMessage("[ParentalControl] You now have " + new_budget + " minutes left to play!");
+					}
+					System.out.println(player + "." + rulename + " budget: " + new_budget);
+				}
+			}
+		}
+		SaveBudgets();
+	}
+	
+	public void MinuteTimer() {
+		for(String player: mPlayerRules.keySet()) {
+			for(String rulename: mPlayerRules.get(player)) {
+				Rule rule = mRules.get(rulename);
+				if(rule instanceof OnlineTimeRule) {
+					OnlineTimeRule r = (OnlineTimeRule)rule;
+					int new_budget = GetPlayerBudget(player, rulename) - 1;
+					mPlayerRuleBudget.put(player + "." + rulename, new_budget);
+					if(r.mWarning) {
+						mPlugin.WarnAboutBudget(player, new_budget);
+					}
+				}
+			}
+		}
+		SaveBudgets();
+	}
+	
 	public boolean AddPlayerRule(String player, String rule) {
 		if(! mPlayerRules.containsKey(player)) {
 			mPlayerRules.put(player, new ArrayList<String>());
 		}
 		if(mRules.containsKey(rule)) {
+			for(String rz: mPlayerRules.get(player)) {
+				Rule r1 = mRules.get(rz);
+				Rule r2 = mRules.get(rule);
+				if(r1 instanceof OnlineTimeRule && r2 instanceof OnlineTimeRule &&
+						((OnlineTimeRule) r1).mKeepRemainder && ((OnlineTimeRule)r2).mKeepRemainder) {
+					// two rules of same type (online time + remainder)
+					// this should not be possible
+					System.err.println("The two rules " + rz + " and " + rule + " have the same type.");
+					System.err.println("They cannot be both applied to player " + player);
+					System.exit(1);
+				}
+			}
 			mPlayerRules.get(player).add(rule);
 			return true;
 		}
